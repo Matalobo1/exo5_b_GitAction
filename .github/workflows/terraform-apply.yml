@@ -1,1 +1,47 @@
+name: Terraform - Apply (Create EC2)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "terraform/**"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: 1) Checkout code
+        uses: actions/checkout@v4
+
+      - name: 2) Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: 3) Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: 4) Terraform init (S3 backend)
+        run: terraform init
+
+      - name: 5) Terraform fmt (optional)
+        run: terraform fmt -check
+
+      - name: 6) Terraform validate
+        run: terraform validate
+
+      - name: 7) Terraform plan
+        run: terraform plan -out=tfplan
+
+      - name: 8) Terraform apply
+        run: terraform apply -auto-approve tfplan
 
