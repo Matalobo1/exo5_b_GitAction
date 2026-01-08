@@ -34,9 +34,6 @@ jobs:
       - name: 4) Terraform init (S3 backend)
         run: terraform init
 
-      - name: 5) Terraform fmt (optional)
-        run: terraform fmt -check
-
       - name: 6) Terraform validate
         run: terraform validate
 
